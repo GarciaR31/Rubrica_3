@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Tarea</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        form {
+            width: 60%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        section {
+            max-width: 800px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 150px;
+            margin: 0 auto;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Bienvenido, {{ nombre }}!</h2>
+    <header>
+        <h1>Lista del Deposito</h1>
+    </header>
+
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for deposito in data_dp %}
+                <tr>
+                    <td>{{ deposito[0] }}</td>
+                    <td>{{ deposito[1] }}</td>
+                    <td>{{ deposito[3] }}</td>
+                    <td>
+                        <form id="registroForm_{{ deposito[0] }}" method="POST" action="{{ url_for('actualizar_cantidad', id=deposito[0], nombre=nombre) }}" onsubmit="return validarCantidad('{{ deposito[0] }}')">
+                            <input type="number" id="cantidad_{{ deposito[0] }}" name="cantidad" min="1" max="{{ deposito[2] }}" required />
+
+                            <input type="hidden" name="producto_nombre" value="{{ deposito[1] }}" />
+
+                            <input type="hidden" name="precios"  value="{{ deposito[3] }}" />
+                            <button type="submit">Actualizar</button>
+                        </form>                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <a href="{{ url_for('mostrar_listados', nombre=nombre) }}"> Ver Lista</a>
+
+    <script>
+        var seleccionProductos = {};
+
+        function validarCantidad(depositoId) {
+            var inputCantidad = document.getElementById("cantidad_" + depositoId);
+            var cantidadSeleccionada = parseInt(inputCantidad.value, 10);
+            var cantidadDisponible = parseInt(inputCantidad.getAttribute("max"), 10)
+        
+            if (cantidadSeleccionada > cantidadDisponible) {
+                alert("La cantidad seleccionada supera la cantidad disponible en el depósito.");
+                return false;
+            } else if (cantidadDisponible === 0) {
+                alert("La cantidad disponible en el depósito es 0. No se puede seleccionar más.");
+                return false;
+            } else {
+                seleccionProductos[depositoId] = cantidadSeleccionada;
+                return true;
+            }
+        }
+
+    </script>
+
+    <a href="/">Regresar</a>
+</body>
+</html>
